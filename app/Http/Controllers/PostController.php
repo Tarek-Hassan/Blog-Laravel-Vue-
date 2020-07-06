@@ -16,7 +16,8 @@ class PostController extends Controller
     public function index()
     {
 
-        return PostResource::collection(Post::all());
+        // return PostResource::collection(Post::all());
+        return PostResource::collection(Post::orderBy('created_at','desc')->paginate(5));
         //
     }
 
@@ -40,7 +41,7 @@ class PostController extends Controller
     {
         $post=Post::create($request->all());
 
-        return PostResource::collection($post);
+        return $post;
         //
     }
 
@@ -52,7 +53,7 @@ class PostController extends Controller
      */
     public function show($id)
     {
-        return PostResource::collection(Post::findOrFail($id));
+        return Post::findOrFail($id);
         //
     }
     
@@ -81,7 +82,7 @@ class PostController extends Controller
         $post=Post::findOrFail($id);
         $post->update($request->all());
         $post->fresh();
-        return PostResource::collection($post);
+        return $post;
     }
 
     /**
@@ -92,8 +93,11 @@ class PostController extends Controller
      */
     public function destroy($id)
     {
-        $post=Post::findOrFail($id);
+        $post=Post::find($id);
+        $post->comments()->delete();
+        
         $post->delete();
-        return PostResource::collection($post);
+        return $post;
+        // return $post;
     }
 }
