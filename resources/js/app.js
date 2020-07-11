@@ -8,27 +8,82 @@ require('./bootstrap');
 
 window.Vue = require('vue');
 
-/**
- * The following block of code may be used to automatically register your
- * Vue components. It will recursively scan this directory for the Vue
- * components and automatically register them with their "basename".
- *
- * Eg. ./components/ExampleComponent.vue -> <example-component></example-component>
- */
+import Vue from 'vue'
+import VueRouter from 'vue-router'
+Vue.use (VueRouter)
+import App from './components/App'
+import Login from './components/Login'
+import Register from './components/Register'
+import Home from './components/Home'
+import Articles from './components/Articles'
 
-// const files = require.context('./', true, /\.vue$/i)
-// files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
+const router =new VueRouter({
+    mode:'history',
+    routes:[
+        {
+            path:'/',
+            name:'home',
+            component:Home
+        },
+        {
+            path:'/login',
+            name:'login',
+            component:Login
+        },
+        {
+            path:'/register',
+            name:'register',
+            component:Register
+        },
+        {
+            path:'/articles',
+            name:'articles',
+            component:Articles,
+            meta:{
+                requiresAuth:true,
+                is_user:true
+            }
+        },
+    ]
+})
+router.beforeEach((to, from, next) => {
+    if (to.matched.some(record => record.meta.requiresAuth)) {
+        if (localStorage.getItem('store.token') == null) {
+            next({
+                path: '/login',
+                params: { nextUrl: to.fullPath }
+            })
+        } else {
+            let user = JSON.parse(localStorage.getItem('store.user'))
+            if (to.matched.some(record => record.meta.is_admin)) {
+                if (user.is_admin == 1) {
+                    next()
+                }
+                else {
+                    next({ name: 'articles' })
+                }
+            }
+            else if (to.matched.some(record => record.meta.is_user)) {
+                if (user.is_admin == 0) {
+                    next()
+                }
+                else {
+                    next({ name: 'admin' })
+                }
+            }
+            next()
+        }
+    } else {
+        next()
+    }
+})
+// Vue.component('nav-component', require('./components/NavComponent.vue').default);
+// Vue.component('articles-component', require('./components/ArticlesComponent.vue').default);
+// Vue.component('example-component', require('./components/ExampleComponent.vue').default);
 
-Vue.component('nav-component', require('./components/NavComponent.vue').default);
-Vue.component('articles-component', require('./components/ArticlesComponent.vue').default);
-Vue.component('example-component', require('./components/ExampleComponent.vue').default);
-// Vue.prototype.$userId = document.querySelector("meta[name='user-id']").getAttribute('content');
-/**
- * Next, we will create a fresh Vue application instance and attach it to
- * the page. Then, you may begin adding components to this application
- * or customize the JavaScript scaffolding to fit your unique needs.
- */
 
 const app = new Vue({
     el: '#app',
+    components:{App},
+    router,
 });

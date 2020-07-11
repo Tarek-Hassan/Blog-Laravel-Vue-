@@ -18,9 +18,9 @@ class DatabaseSeeder extends Seeder
         'email' => 'admin@admin.com',
         'password' => Hash::make('123456789')
         ]);
-        // $this->call(UserSeeder::class);
         $users = factory(App\User::class, 3)->create();
         $posts = factory(App\Post::class,20)->create();
         $comments = factory(App\Comment::class,50)->create();
+        $this->call(ProductsTableSeeder::class);
     }
 }

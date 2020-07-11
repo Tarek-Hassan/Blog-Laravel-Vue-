@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Post;
 use App\Http\Resources\PostResource;
+use Illuminate\Support\Facades\Auth;
 
 class PostController extends Controller
 {
@@ -39,6 +40,7 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
+       
         $post=Post::create($request->all());
 
         return $post;
