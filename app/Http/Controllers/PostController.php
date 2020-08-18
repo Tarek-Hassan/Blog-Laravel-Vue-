@@ -3,12 +3,45 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Post;
+use Illuminate\Http\Response;
+
+use App\Post;  
 use App\Http\Resources\PostResource;
 use Illuminate\Support\Facades\Auth;
 
 class PostController extends Controller
 {
+     /**
+     * @OA\Post(
+     ** path="/posts",
+     *   tags={"posts"},
+     *   summary="posts",
+     *
+     *   @OA\Response(
+     *      response=200,
+     *       description="Success",
+     *      @OA\MediaType(
+     *           mediaType="application/json",
+     *      )
+     *   ),
+     *   @OA\Response(
+     *      response=401,
+     *       description="Unauthenticated"
+     *   ),
+     *   @OA\Response(
+     *      response=400,
+     *      description="Bad Request"
+     *   ),
+     *   @OA\Response(
+     *      response=404,
+     *      description="not found"
+     *   ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden"
+     *      )
+     *)
+     **/
     /**
      * Display a listing of the resource.
      *
@@ -16,9 +49,18 @@ class PostController extends Controller
      */
     public function index()
     {
-
-        // return PostResource::collection(Post::all());
-        return PostResource::collection(Post::orderBy('created_at','desc')->paginate(5));
+        $posts=Post::orderBy('created_at','desc')->
+                     paginate(5);
+                     return response()->json([
+                        'status' => 'success',
+                        'status_code' => Response::HTTP_OK,
+                        'data' => [
+                            'users' =>PostResource::collection($posts)
+                        ],
+                        'message' => 'All users pulled out successfully'
+            
+                    ]);
+       
         //
     }
 
